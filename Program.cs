@@ -7,5 +7,7 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+builder.Services.AddScoped<EventEase.Services.SessionService>();
+builder.Services.AddScoped<EventEase.Services.AttendanceService>();
 
 await builder.Build().RunAsync();

@@ -1,29 +1,60 @@
 @using EventEase.Models
+@using System.ComponentModel.DataAnnotations
 
-<div class="card shadow-sm">
-    <div class="card-body">
-        <h3 class="card-title">@Model.Name</h3>
-        <p class="card-text">
-            <strong>Date:</strong> @Model.Date.ToString("MMMM dd, yyyy")
-        </p>
-        <p class="card-text">
-            <strong>Location:</strong> @Model.Location
-        </p>
+@if (IsEditable)
+{
+    <EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
 
-        <div class="mt-3">
-            <label class="form-label" for="event-name">Event name</label>
-            <InputText id="event-name" class="form-control" @bind-Value="Model.Name" />
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="mb-2">
+                    <label class="form-label" for="event-name">Event name</label>
+                    <InputText id="event-name" class="form-control" @bind-Value="Model.Name" />
+                    <ValidationMessage For="@(() => Model.Name)" />
+                </div>
 
-            <label class="form-label mt-2" for="event-date">Event date</label>
-            <InputDate id="event-date" class="form-control" @bind-Value="Model.Date" />
+                <div class="mb-2">
+                    <label class="form-label" for="event-date">Event date</label>
+                    <InputDate id="event-date" class="form-control" @bind-Value="Model.Date" />
+                    <ValidationMessage For="@(() => Model.Date)" />
+                </div>
 
-            <label class="form-label mt-2" for="event-location">Location</label>
-            <InputText id="event-location" class="form-control" @bind-Value="Model.Location" />
+                <div class="mb-2">
+                    <label class="form-label" for="event-location">Location</label>
+                    <InputText id="event-location" class="form-control" @bind-Value="Model.Location" />
+                    <ValidationMessage For="@(() => Model.Location)" />
+                </div>
+
+                <button type="submit" class="btn btn-sm btn-outline-success mt-2">Save</button>
+            </div>
+        </div>
+    </EditForm>
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h3 class="card-title">@Model.Name</h3>
+            <p class="card-text"><strong>Date:</strong> @Model.Date.ToString("MMMM dd, yyyy")</p>
+            <p class="card-text"><strong>Location:</strong> @Model.Location</p>
         </div>
     </div>
-</div>
+}
 
 @code {
     [Parameter, EditorRequired]
     public EventModel Model { get; set; } = new();
+
+    [Parameter]
+    public bool IsEditable { get; set; } = true;
+
+    [Parameter]
+    public EventCallback<EventModel> OnValidSubmit { get; set; }
+
+    private async Task HandleValidSubmit()
+    {
+        await OnValidSubmit.InvokeAsync(Model);
+    }
 }

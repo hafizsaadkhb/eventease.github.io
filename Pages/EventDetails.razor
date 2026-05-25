@@ -6,11 +6,12 @@
 {
     <h1>Event not found</h1>
     <p>Return to the event list to choose a different event.</p>
+    <NavLink class="btn btn-link" href="/events">Back to events</NavLink>
 }
 else
 {
     <h1>@selectedEvent.Name</h1>
-    <EventCard Model="selectedEvent" />
+    <EventCard Model="selectedEvent" IsEditable="false" />
     <p class="mt-3">@selectedEvent.Description</p>
     <NavLink class="btn btn-primary" href="@($"registration/{selectedEvent.Id}")">Register</NavLink>
 }

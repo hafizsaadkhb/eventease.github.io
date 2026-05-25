@@ -1,0 +1,30 @@
+@inject EventEase.Services.SessionService Session
+
+<div class="session-tracker ps-3 py-2">
+    @if (Session.Current != null)
+    {
+        <div class="small text-muted">
+            Signed in as <strong>@Session.Current.Name</strong> (<a href="mailto:@Session.Current.Email">@Session.Current.Email</a>)
+            <button class="btn btn-link btn-sm" @onclick="SignOut">Sign out</button>
+        </div>
+    }
+    else
+    {
+        <div class="small text-muted">
+            <em>No active session</em>
+        </div>
+    }
+</div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await Session.InitializeAsync();
+        Session.OnChange += StateHasChanged;
+    }
+
+    private async Task SignOut()
+    {
+        await Session.ClearAsync();
+    }
+}

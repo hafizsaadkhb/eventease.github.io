@@ -6,19 +6,47 @@
 <h1>Upcoming Events</h1>
 <p>Browse upcoming events and open the details or registration pages.</p>
 
-<div class="d-flex flex-column gap-4">
-    @foreach (var eventItem in events)
-    {
-        <div>
-            <EventCard Model="eventItem" />
-            <div class="mt-2">
-                <NavLink class="btn btn-outline-primary me-2" href="@($"events/{eventItem.Id}")">Details</NavLink>
-                <NavLink class="btn btn-primary" href="@($"registration/{eventItem.Id}")">Register</NavLink>
-            </div>
-        </div>
-    }
+<div class="mb-3">
+    <button class="btn btn-secondary me-2" @onclick="LoadDefault">Load default</button>
+    <button class="btn btn-outline-secondary me-2" @onclick="LoadLarge">Load 10,000 items</button>
+    <span class="text-muted">Showing @events.Count events</span>
 </div>
 
+@if (events == null || events.Count == 0)
+{
+    <p><em>No events found.</em></p>
+}
+else
+{
+    <Virtualize Items="events" Context="eventItem" ItemSize="90">
+        <ItemContent>
+            <div @key="eventItem.Id" class="mb-3">
+                <EventCard Model="eventItem" IsEditable="false" />
+                <div class="mt-2">
+                    <NavLink class="btn btn-outline-primary me-2" href="@($"events/{eventItem.Id}")">Details</NavLink>
+                    <NavLink class="btn btn-primary" href="@($"registration/{eventItem.Id}")">Register</NavLink>
+                </div>
+            </div>
+        </ItemContent>
+    </Virtualize>
+}
+
 @code {
-    private List<EventModel> events = EventModel.GetSampleEvents();
+    private List<EventModel> events = new();
+
+    protected override void OnInitialized()
+    {
+        events = EventModel.GetSampleEvents();
+    }
+
+    private void LoadDefault()
+    {
+        events = EventModel.GetSampleEvents();
+    }
+
+    private void LoadLarge()
+    {
+        events = EventModel.GetSampleEvents(10000);
+        StateHasChanged();
+    }
 }

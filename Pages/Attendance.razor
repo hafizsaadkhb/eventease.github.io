@@ -1,0 +1,125 @@
+@page "/attendance"
+@inject EventEase.Services.AttendanceService AttendanceService
+
+<PageTitle>Attendance</PageTitle>
+
+<h1>Attendance</h1>
+
+@if (events == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Event</th>
+                <th>Date</th>
+                <th>Location</th>
+                <th>Registrations</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ev in events)
+            {
+                <tr>
+                    <td>@ev.Name</td>
+                    <td>@ev.Date.ToString("yyyy-MM-dd")</td>
+                    <td>@ev.Location</td>
+                    <td>@(counts.ContainsKey(ev.Id) ? counts[ev.Id] : 0)</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" @onclick="() => ToggleDetails(ev.Id)">View</button>
+                    </td>
+                </tr>
+                @if (showDetailsFor == ev.Id)
+                {
+                    <tr>
+                        <td colspan="5">
+                            <h5>Registrations</h5>
+                            @if (registrations == null || !registrations.Any())
+                            {
+                                <p><em>No registrations yet.</em></p>
+                            }
+                            else
+                            {
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Notes</th>
+                                            <th>Attended</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var r in registrations)
+                                        {
+                                            <tr>
+                                                <td>@r.Name</td>
+                                                <td>@r.Email</td>
+                                                <td>@r.Notes</td>
+                                                <td>@(r.Attended ? "Yes" : "No")</td>
+                                                <td>
+                                                    @if (!r.Attended)
+                                                    {
+                                                        <button class="btn btn-sm btn-success" @onclick="() => MarkAttended(r.Id)">Mark attended</button>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<EventEase.Models.EventModel>? events;
+    private Dictionary<int, int> counts = new();
+    private int showDetailsFor = -1;
+    private List<EventEase.Models.RegistrationRecord>? registrations;
+
+    protected override async Task OnInitializedAsync()
+    {
+        events = EventEase.Models.EventModel.GetSampleEvents(10);
+        await AttendanceService.InitializeAsync();
+
+        foreach (var ev in events)
+        {
+            counts[ev.Id] = await AttendanceService.GetCountForEventAsync(ev.Id);
+        }
+    }
+
+    private async Task ToggleDetails(int eventId)
+    {
+        if (showDetailsFor == eventId)
+        {
+            showDetailsFor = -1;
+            registrations = null;
+        }
+        else
+        {
+            showDetailsFor = eventId;
+            registrations = await AttendanceService.GetForEventAsync(eventId);
+        }
+    }
+
+    private async Task MarkAttended(int registrationId)
+    {
+        await AttendanceService.MarkAttendedAsync(registrationId);
+        if (showDetailsFor != -1)
+        {
+            registrations = await AttendanceService.GetForEventAsync(showDetailsFor);
+            counts[showDetailsFor] = await AttendanceService.GetCountForEventAsync(showDetailsFor);
+            StateHasChanged();
+        }
+    }
+}
