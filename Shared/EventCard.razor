@@ -1,0 +1,29 @@
+@using EventEase.Models
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h3 class="card-title">@Model.Name</h3>
+        <p class="card-text">
+            <strong>Date:</strong> @Model.Date.ToString("MMMM dd, yyyy")
+        </p>
+        <p class="card-text">
+            <strong>Location:</strong> @Model.Location
+        </p>
+
+        <div class="mt-3">
+            <label class="form-label" for="event-name">Event name</label>
+            <InputText id="event-name" class="form-control" @bind-Value="Model.Name" />
+
+            <label class="form-label mt-2" for="event-date">Event date</label>
+            <InputDate id="event-date" class="form-control" @bind-Value="Model.Date" />
+
+            <label class="form-label mt-2" for="event-location">Location</label>
+            <InputText id="event-location" class="form-control" @bind-Value="Model.Location" />
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public EventModel Model { get; set; } = new();
+}

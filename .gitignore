@@ -1,0 +1,63 @@
+# Build outputs
+bin/
+obj/
+
+# Visual Studio files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+*.sln.iml
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# Publish output
+publish/
+
+# NuGet
+packages/
+*.nupkg
+
+# Resharper
+_ReSharper*/
+*.DotSettings.user
+
+# Logs
+*.log
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Temporary files
+*.tmp
+*.temp
+
+# JetBrains Rider workspace
+.idea/
+
+# VS Code
+.vscode/
+
+# node modules if added
+node_modules/
+
+# Static web assets
+wwwroot/ (if you plan to commit static built artifacts)
+
+# Others
+*.psess
+*.vsp
+test/TestResult*/
+
+# Secrets
+secrets.json
+
+# Dotnet watch files
+.dotnet
+dotnet-watch.json

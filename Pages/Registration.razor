@@ -1,0 +1,62 @@
+@page "/registration/{eventId:int}"
+
+<PageTitle>Registration</PageTitle>
+
+@if (selectedEvent == null)
+{
+    <h1>Event not found</h1>
+    <p>Return to the event list to choose a different event.</p>
+}
+else
+{
+    <h1>Register for @selectedEvent.Name</h1>
+    <p>@selectedEvent.Date.ToString("MMMM dd, yyyy") - @selectedEvent.Location</p>
+
+    @if (isSubmitted)
+    {
+        <div class="alert alert-success" role="alert">
+            Thanks, @registrationName! Your registration has been submitted.
+        </div>
+    }
+
+    <EditForm Model="this" OnValidSubmit="HandleSubmit" class="mt-3">
+        <div class="mb-3">
+            <label class="form-label" for="name">Full name</label>
+            <InputText id="name" class="form-control" @bind-Value="registrationName" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="email">Email</label>
+            <InputText id="email" class="form-control" @bind-Value="registrationEmail" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="notes">Notes</label>
+            <InputTextArea id="notes" class="form-control" @bind-Value="registrationNotes" />
+        </div>
+
+        <button class="btn btn-primary" type="submit">Submit registration</button>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public int EventId { get; set; }
+
+    private EventModel? selectedEvent;
+    private string registrationName = string.Empty;
+    private string registrationEmail = string.Empty;
+    private string registrationNotes = string.Empty;
+    private bool isSubmitted;
+
+    protected override void OnParametersSet()
+    {
+        selectedEvent = EventModel.GetSampleEvents()
+            .FirstOrDefault(item => item.Id == EventId);
+    }
+
+    private void HandleSubmit()
+    {
+        isSubmitted = true;
+    }
+}
