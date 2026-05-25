@@ -57,14 +57,37 @@ else
     private RegistrationModel registrationModel = new();
     private bool isSubmitted;
 
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
+        await SessionService.InitializeAsync();
+        await AttendanceService.InitializeAsync();
+
         selectedEvent = EventModel.GetSampleEvents()
             .FirstOrDefault(item => item.Id == EventId);
+
+        if (SessionService.Current != null)
+        {
+            registrationModel.Name = SessionService.Current.Name;
+            registrationModel.Email = SessionService.Current.Email;
+        }
     }
 
-    private void HandleSubmit()
+    private async Task HandleSubmit()
     {
+        // persist session
+        await SessionService.SetCurrentAsync(registrationModel.Name, registrationModel.Email);
+
+        // persist registration
+        var record = new EventEase.Models.RegistrationRecord
+        {
+            EventId = EventId,
+            Name = registrationModel.Name,
+            Email = registrationModel.Email,
+            Notes = registrationModel.Notes,
+            RegisteredAtUtc = DateTime.UtcNow
+        };
+
+        await AttendanceService.AddAsync(record);
         isSubmitted = true;
     }
 
